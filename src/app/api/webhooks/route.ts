@@ -13,7 +13,7 @@ export async function POST(req: Request) {
             return new Response('Invalid signature', { status: 400 })
         }
 
-        const event = stripe.webhooks.constructEvent(body, signature, 'need to past env')
+        const event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET!)
 
         if (event.type === 'checkout.session.completed') {
             if (!event.data.object.customer_details?.email) {
@@ -40,8 +40,7 @@ export async function POST(req: Request) {
                 },
                 data: {
                     isPaid: true,
-                    //lower case ShippinAddress must started
-                    ShippingAddress: {
+                    shippingAddress: {
                         create: {
                             name: session.customer_details!.name!,
                             city: shippingAddress!.city!,
